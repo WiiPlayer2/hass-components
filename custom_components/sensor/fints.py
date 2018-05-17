@@ -64,6 +64,9 @@ class FintsSensor(Entity):
     def icon(self):
         return 'mdi:bank'
 
+    def is_marked_stmt(self, stmt):
+        return stmt.data['date'] != stmt.data['entry_date'] or stmt.data['applicant_name'] is None
+
     def update(self):
         """Fetch new state data for the sensor.
 
@@ -74,7 +77,7 @@ class FintsSensor(Entity):
 
         markedValue = 0
         index = -1
-        while index >= -(len(stmts)) and stmts[index].data['date'] != stmts[index].data['entry_date'] :
+        while index >= -(len(stmts)) and self.is_marked_stmt(stmts[index]) :
             markedValue += stmts[index].data['amount'].amount
             index -= 1
         if len(stmts) + index >= 0:
