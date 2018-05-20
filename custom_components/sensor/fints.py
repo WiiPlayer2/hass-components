@@ -65,6 +65,8 @@ class FintsSensor(Entity):
         return 'mdi:bank'
 
     def is_marked_stmt(self, stmt):
+        if stmt.data['amount'].amount > 0:
+            return False
         return stmt.data['date'] != stmt.data['entry_date'] or stmt.data['applicant_name'] is None
 
     def update(self):
