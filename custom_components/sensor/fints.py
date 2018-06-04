@@ -93,9 +93,11 @@ class FintsSensor(Entity):
         elif len(stmts) > 0:
             stmt = stmts[-1]
 
-        self._pendingStmt = stmts[-1]
+        if len(stmts) > 0:
+            self._pendingStmt = stmts[-1]
         if stmt == self._pendingStmt:
             self._pendingStmt = None
+
         self._balance = self._client.get_balance(self._account).amount
         self._pendingValue = markedValue
         self._pendingBalance = self._balance.amount + markedValue
