@@ -22,8 +22,9 @@ class FintsSensor(Entity):
         self._state = None
         self._lastStmt = None
         self._balance = 0
-        self._markedBalance = 0
-        self._markedValue = 0
+        self._pendingBalance = 0
+        self._pendingValue = 0
+        self._pendingStmt = None
         self.update()
 
     @property
@@ -48,14 +49,19 @@ class FintsSensor(Entity):
     @property
     def device_state_attributes(self):
         stmt = self._lastStmt
+        pend = self._pendingStmt
         if stmt:
             return {
-                'marked_balance': float(self._markedBalance),
-                'marked_value': float(self._markedValue),
-                'date': stmt.data['date'].isoformat(),
-                'value': float(stmt.data['amount'].amount),
-                'applicant': stmt.data['applicant_name'],
-                'purpose': stmt.data['purpose']
+                'pending_balance': float(self._pendingBalance),
+                'pending_total_value': float(self._pendingValue),
+                'pending_date': (pend or None) and pend.data['date'].isoformat(),
+                'pending_value': (pend or None) and float(pend.data['amount'].amount),
+                'pending_applicant': (pend or None) and pend.data['applicant_name'],
+                'pending_purpose': (pend or None) and pend.data['purpose'],
+                'last_date': stmt.data['date'].isoformat(),
+                'last_value': float(stmt.data['amount'].amount),
+                'last_applicant': stmt.data['applicant_name'],
+                'last_purpose': stmt.data['purpose']
             }
         else:
             return {}
@@ -64,7 +70,7 @@ class FintsSensor(Entity):
     def icon(self):
         return 'mdi:bank'
 
-    def is_marked_stmt(self, stmt):
+    def is_pending_stmt(self, stmt):
         if stmt.data['amount'].amount > 0:
             return False
         return stmt.data['date'] != stmt.data['entry_date'] or stmt.data['applicant_name'] is None
@@ -79,7 +85,7 @@ class FintsSensor(Entity):
 
         markedValue = 0
         index = -1
-        while index >= -(len(stmts)) and self.is_marked_stmt(stmts[index]) :
+        while index >= -(len(stmts)) and self.is_pending_stmt(stmts[index]) :
             markedValue += stmts[index].data['amount'].amount
             index -= 1
         if len(stmts) + index >= 0:
@@ -87,7 +93,10 @@ class FintsSensor(Entity):
         elif len(stmts) > 0:
             stmt = stmts[-1]
 
+        self._pendingStmt = stmts[-1]
+        if stmt == self._pendingStmt:
+            self._pendingStmt = None
         self._balance = self._client.get_balance(self._account).amount
-        self._markedValue = markedValue
-        self._markedBalance = self._balance.amount + markedValue
+        self._pendingValue = markedValue
+        self._pendingBalance = self._balance.amount + markedValue
         self._lastStmt = stmt
