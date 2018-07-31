@@ -1,13 +1,13 @@
 REQUIREMENTS = ['fints==0.2.1']
 
 from datetime import date, timedelta
-from fints.client import FinTS3PinTanClient
 from homeassistant.helpers.entity import Entity
 
 SCAN_INTERVAL = timedelta(minutes=15)
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup the sensor platform."""
+    from fints.client import FinTS3PinTanClient
     client = FinTS3PinTanClient(str(config['blz']), str(config['username']), str(config['pin']), str(config['endpoint']))
     add_devices([FintsSensor(client, account) for account in client.get_sepa_accounts()])
 
