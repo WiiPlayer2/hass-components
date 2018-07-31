@@ -8,6 +8,7 @@ SCAN_INTERVAL = timedelta(minutes=1)
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup the sensor platform."""
     add_devices([AnimeSensor(id) for id in config['ids']])
+    add_devices([CombinedAnimeSensor(config['ids'])])
 
 def _get_json(url):
     import requests
@@ -17,8 +18,57 @@ def _get_json(url):
 def _get_detailed(id):
     return _get_json('https://www.masterani.me/api/anime/{}/detailed'.format(id))
 
+def _get_releases():
+    return _get_json('https://www.masterani.me/api/releases')
+
 class CombinedAnimeSensor(Entity):
-    pass
+    def __init__(self, ids):
+        self._ids = ids
+        self._data = None
+        self._cover = None
+    
+    @property
+    def name(self):
+        return 'Masterani'
+    
+    @property
+    def entity_id(self):
+        return 'sensor.masterani'
+    
+    @property
+    def state(self):
+        if self._data:
+            return '{} #{}'.format(self._data['anime']['title'], self._data['episode'])
+        else:
+            return None
+    
+    @property
+    def device_state_attributes(self):
+        if self._data:
+            a = self._data['anime']
+            return {
+                'id': a['id'],
+                'title': a['title'],
+                'episode': self._data['episode'],
+            }
+        else:
+            return { }
+    
+    @property
+    def icon(self):
+        return 'mdi:filmstrip'
+    
+    @property
+    def entity_picture(self):
+        return self._cover
+
+    def update(self):
+        releases = _get_releases()
+        for r in releases:
+            if str(r['anime']['id']) in self._ids:
+                self._data = r
+                self._cover = 'https://cdn.masterani.me/poster/3/{}'.format(self._data['anime']['poster'])
+                break
 
 class AnimeSensor(Entity):
     def __init__(self, id):
