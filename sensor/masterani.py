@@ -8,7 +8,7 @@ SCAN_INTERVAL = timedelta(minutes=1)
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup the sensor platform."""
     add_devices([AnimeSensor(id) for id in config['ids']])
-    add_devices([CombinedAnimeSensor(config['ids'])])
+    add_devices([CombinedAnimeSensor([str(id) for id in config['ids']])])
 
 def _get_json(url):
     import requests
