@@ -42,7 +42,8 @@ class AnimeSensor(Entity):
     @property
     def state(self):
         if self._data:
-            return self.device_state_attributes['last_episode']
+            return None
+            #return self.device_state_attributes['last_episode']
         else:
             return None
 
@@ -74,6 +75,7 @@ class AnimeSensor(Entity):
 
     def update(self):
         self._data = _get_detailed(self.id)
+        print(self._data)
 
         if self._data['poster']:
             self._cover = 'https://cdn.masterani.me/poster/3/{}'.format(self._data['poster'])
