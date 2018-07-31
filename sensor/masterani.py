@@ -26,6 +26,7 @@ class CombinedAnimeSensor(Entity):
         self._ids = ids
         self._data = None
         self._cover = None
+        self.update()
     
     @property
     def name(self):
