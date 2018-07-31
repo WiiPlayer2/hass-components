@@ -25,6 +25,7 @@ class AnimeSensor(Entity):
         self.id = id
         self._data = None
         self._cover = None
+        self.update()
 
     @property
     def name(self):
