@@ -129,5 +129,8 @@ class AnimeSensor(Entity):
     def update(self):
         self._data = _get_detailed(self.id)
 
+        if 'info' not in self._data:
+            self._data = None
+
         if self._data['poster']:
             self._cover = 'https://cdn.masterani.me/poster/3/{}'.format(self._data['poster'])
