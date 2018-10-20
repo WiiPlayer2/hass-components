@@ -113,12 +113,15 @@ class AnimeSensor(Entity):
     def device_state_attributes(self):
         if self._data:
             d = self._data['info']
-            e = self._data['episodes'][-1]['info']
+            e = None
+            if 'episodes' in self._data and len(self._data['episodes']) > 0:
+                e = self._data['episodes'][-1]['info']
+            
             return {
                 'title': d['title'],
                 'episodes': d['episode_count'],
-                'last_episode': e['episode'],
-                'last_episode_title': e['title'],
+                'last_episode': e['episode'] if e else None,
+                'last_episode_title': e['title'] if e else None,
             }
         else:
             return { }
