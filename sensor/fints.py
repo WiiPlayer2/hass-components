@@ -21,17 +21,18 @@ class FintsSensor(Entity):
         self._account = account
         self._state = None
         self._lastStmt = None
-        self._balance = 0
+        self._balance = None
         self._pendingBalance = 0
         self._pendingValue = 0
         self._pendingStmt = None
         self._entityId = 'sensor.fints_{}'.format(self._account.iban).lower()
+        self._name = 'Account {}'.format(self._account.iban)
         # self.update()
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return 'Account {}'.format(self._account.iban)
+        return self._name
 
     @property
     def entity_id(self):
@@ -40,12 +41,18 @@ class FintsSensor(Entity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._balance.amount
+        if(self._balance):
+            return self._balance.amount
+        else:
+            return 0
 
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return self._balance.currency
+        if self._balance:
+            return self._balance.currency
+        else:
+            return ""
 
     @property
     def device_state_attributes(self):
