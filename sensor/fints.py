@@ -25,7 +25,7 @@ class FintsSensor(Entity):
         self._pendingBalance = 0
         self._pendingValue = 0
         self._pendingStmt = None
-        self.update()
+        # self.update()
 
     @property
     def name(self):
