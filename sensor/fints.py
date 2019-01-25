@@ -25,6 +25,7 @@ class FintsSensor(Entity):
         self._pendingBalance = 0
         self._pendingValue = 0
         self._pendingStmt = None
+        self._entityId = 'sensor.fints_{}'.format(self._account.iban).lower()
         # self.update()
 
     @property
@@ -34,7 +35,7 @@ class FintsSensor(Entity):
 
     @property
     def entity_id(self):
-        return 'sensor.fints_{}'.format(self._account.iban)
+        return self._entityId
 
     @property
     def state(self):
