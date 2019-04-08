@@ -27,7 +27,11 @@ class FintsSensor(Entity):
         self._pendingStmt = None
         self._entityId = 'sensor.fints_{}'.format(self._account.iban).lower()
         self._name = 'Account {}'.format(self._account.iban)
-        # self.update()
+        
+        try:
+            self.update()
+        except:
+            pass
 
     @property
     def name(self):
